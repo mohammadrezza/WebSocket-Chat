@@ -21,7 +21,6 @@ def sessions():
 
 @socketio.on('msg event')
 def handle_msg_event(json):
-    # socketio.send(json, broadcast=True)
     print(json)
     socketio.emit('msg event', json)
 
