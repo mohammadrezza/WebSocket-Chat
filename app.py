@@ -2,28 +2,40 @@ from flask_socketio import SocketIO
 from flask import Flask, render_template, request
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'vnkdjnfjknfl1232#'
-socketio = SocketIO(app)
+app.config['SECRET_KEY'] = 'secret_socket_io_key'
+socket_io = SocketIO(app)
+
+rooms = ["nsp1", "nsp2"]
 
 
 @app.route('/', methods=['GET'])
 def home():
-    return render_template('home.html')
+    return render_template('index.html', nsp=rooms)
 
 
-@app.route('/chatroom', methods=['POST'])
+@app.route('/sessions', methods=['POST'])
 def sessions():
-    data = request.form.to_dict()
-    username = data["username"]
-    print(username)
-    return render_template('session.html', username=username)
+    body = request.form.to_dict()
+    username = body["username"]
+    nsp = body["nsp"]
+    return render_template('sessions.html', username=username, nsp=nsp)
 
 
-@socketio.on('msg event')
-def handle_msg_event(json):
+@socket_io.on('msg event', namespace="/nsp1")
+def nsp1_msg_event(json):
+    socket_io.emit('resp msg event', json, namespace="/nsp1")
+
+
+@socket_io.on('msg event', namespace="/nsp2")
+def nsp2_msg_event(json):
+    socket_io.emit('resp msg event', json, namespace="/nsp2")
+
+
+@socket_io.on('cus event')
+def handle_cus_event(json):
     print(json)
-    socketio.emit('msg event', json)
+    socket_io.emit('resp cus event', json, namespace="/")
 
 
 if __name__ == '__main__':
-    socketio.run(app, host="0.0.0.0", debug=True, use_reloader=True)
+    socket_io.run(app, host="0.0.0.0", debug=True, use_reloader=True)

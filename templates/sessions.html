@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ nsp }}</title>
+</head>
+<body>
+<h3 style='color: #ccc;font-size: 30px;'>No message yet..</h3>
+<div class="message_holder"></div>
+
+{#<form id="emit_msg" action="" method="POST">#}
+{#    <input type="text" class="message" placeholder="Messages"/>#}
+{#    <input type="submit"/>#}
+{#</form>#}
+{#<form id="broadcast_msg" action="" method="POST">#}
+{#    <input type="submit"/>#}
+{#</form>#}
+
+<input type="text" class="message" placeholder="Messages"/>
+<button id="nsp1"> nsp</button>
+<button id="nsp2"> all nsps</button>
+
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.min.js"></script>
+{#<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.slim.js"></script>#}
+
+<script type="text/javascript">
+    let socket_nsp = io.connect('http://' + document.domain + ':' + location.port + "/" +{{ nsp | tojson| safe}});
+    let socket_raw = io.connect('http://' + document.domain + ':' + location.port);
+    {#socket.nsp = "/" +{{ room | tojson| safe}};#}
+    socket_nsp.on('connect', function () {
+        let temp = $('#nsp1').on('click', function (e) {
+            e.preventDefault();
+            let user_input = $('input.message').val();
+            socket_nsp.emit('msg event', {
+                user_name: {{username| tojson|safe}},
+                message: user_input
+            });
+        });
+        let temp2 = $('#nsp2').on('click', function (e) {
+            e.preventDefault();
+            let user_input = $('input.message').val();
+            socket_raw.emit('cus event', {
+                user_name: {{username| tojson|safe}},
+                message: user_input
+            });
+        });
+    });
+    socket_nsp.on('resp msg event', function (msg) {
+        console.log(msg);
+        if (typeof msg.user_name !== 'undefined') {
+            $('h3').remove();
+            $('div.message_holder').append('<div><b style="color: #000">' + msg.user_name + '</b> ' + msg.message + '</div>')
+        }
+    });
+    socket_raw.on('resp cus event', function (msg) {
+        console.log(msg);
+        if (typeof msg.user_name !== 'undefined') {
+            $('h3').remove();
+            $('div.message_holder').append('<div><b style="color: #000">' + msg.user_name + '</b> ' + msg.message + '</div>')
+        }
+    });
+</script>
+
+</body>
+</html>

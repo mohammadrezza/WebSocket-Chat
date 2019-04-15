@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Home</title>
+</head>
+<body>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.min.js"></script>
+
+<form action="/sessions" method="POST">
+    <input type="text" name="username" class="form-control" placeholder="Pick A User Name"/>
+    <button class="form-control" name="nsp" value={{ nsp[0] }}>{{ nsp[0] }}</button>
+    <button class="form-control" name="nsp" value={{ nsp[1] }}>{{ nsp[1] }}</button>
+</form>
+
+</body>
+</html>
